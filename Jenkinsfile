@@ -32,8 +32,7 @@ pipeline {
                 bat '''
                     docker --version
                     cd app
-                    docker build -t abrar33001/todo-api:27 -t abrar33001/todo-api:latest .
-                '''
+                   docker build -t %IMAGE_NAME%:%IMAGE_TAG% -t %IMAGE_NAME%:latest .
             }
         }
 
