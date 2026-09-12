@@ -9,9 +9,11 @@ pipeline {
     }
 
     stages {
+
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/abrarulhaqhaq04-stack/Devops-capstone.git'
+                git branch: 'main',
+                    url: 'https://github.com/abrarulhaqhaq04-stack/Devops-capstone.git'
             }
         }
 
@@ -27,29 +29,33 @@ pipeline {
             }
         }
 
-      stage('Build Docker Image') {
-    steps {
-        bat '''
-            docker --version
-            cd app
-            docker build -t %IMAGE_NAME%:%IMAGE_TAG% -t %IMAGE_NAME%:latest .
-        '''
-    }
-}stage('Push to Docker Hub') {
-    steps {
-        withCredentials([usernamePassword(
-            credentialsId: 'DOCKERHUB-CRAD',
-            usernameVariable: 'DOCKER_USER',
-            passwordVariable: 'DOCKER_PASS'
-        )]) {
-            bat 'echo %DOCKER_PASS% | docker login -u %DOCKER_USER% --password-stdin'
-            bat 'docker push %IMAGE_NAME%:%IMAGE_TAG%'
-            bat 'docker push %IMAGE_NAME%:latest'
+        stage('Build Docker Image') {
+            steps {
+                bat '''
+                    docker --version
+                    cd app
+                    docker build -t %IMAGE_NAME%:%IMAGE_TAG% -t %IMAGE_NAME%:latest .
+                '''
+            }
+        }
+
+        stage('Push to Docker Hub') {
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'DOCKERHUB-CRAD',
+                    usernameVariable: 'DOCKER_USER',
+                    passwordVariable: 'DOCKER_PASS'
+                )]) {
+                    bat 'echo %DOCKER_PASS% | docker login -u %DOCKER_USER% --password-stdin'
+                    bat 'docker push %IMAGE_NAME%:%IMAGE_TAG%'
+                    bat 'docker push %IMAGE_NAME%:latest'
+                }
+            }
         }
     }
-}
 
     post {
+
         always {
             bat 'docker logout'
         }
@@ -62,5 +68,4 @@ pipeline {
             echo 'Pipeline failed. Check the logs above.'
         }
     }
-}
 }
