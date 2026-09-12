@@ -36,14 +36,19 @@ pipeline {
         '''
     }
 }
-        stage('Push to Docker Hub') {
-            steps {
-                bat 'echo %DOCKERHUB_CREDENTIALS_PSW% | docker login -u %DOCKERHUB_CREDENTIALS_USR% --password-stdin'
-                bat "docker push %IMAGE_NAME%:%IMAGE_TAG%"
-                bat "docker push %IMAGE_NAME%:latest"
-            }
+       stage('Push to Docker Hub') {
+    steps {
+        withCredentials([usernamePassword(
+            credentialsId: 'DOCKERHUB-CRAD',
+            usernameVariable: 'DOCKER_USER',
+            passwordVariable: 'DOCKER_PASS'
+        )]) {
+            bat 'echo %DOCKER_PASS% | docker login -u %DOCKER_USER% --password-stdin'
+            bat 'docker push %IMAGE_NAME%:%IMAGE_TAG%'
+            bat 'docker push %IMAGE_NAME%:latest'
         }
     }
+}
 
     post {
         always {
