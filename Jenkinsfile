@@ -1,3 +1,4 @@
+```groovy
 pipeline {
     agent any
 
@@ -5,8 +6,7 @@ pipeline {
         DOCKERHUB_CREDENTIALS = credentials('DOCKERHUB-CRAD')
         IMAGE_NAME = 'abrar33001/todo-api'
         IMAGE_TAG = "${env.BUILD_NUMBER}"
-    PATH = "C:\\Program Files\\Docker\\Docker\\resources\\bin;${env.PATH}"
-}
+        PATH = "C:\\Program Files\\Docker\\Docker\\resources\\bin;${env.PATH}"
     }
 
     stages {
@@ -30,11 +30,11 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                 bat '''
-            docker --version
-            cd app
-            docker build -t abrar33001/todo-api:27 -t abrar33001/todo-api:latest .
-        '''
+                bat '''
+                    docker --version
+                    cd app
+                    docker build -t abrar33001/todo-api:27 -t abrar33001/todo-api:latest .
+                '''
             }
         }
 
@@ -51,11 +51,14 @@ pipeline {
         always {
             bat 'docker logout'
         }
+
         success {
             echo 'Pipeline succeeded! Image pushed to Docker Hub.'
         }
+
         failure {
             echo 'Pipeline failed. Check the logs above.'
         }
     }
-
+}
+```
