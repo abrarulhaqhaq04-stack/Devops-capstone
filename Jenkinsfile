@@ -5,7 +5,7 @@ pipeline {
         DOCKERHUB_CREDENTIALS = credentials('DOCKERHUB-CRAD')
         IMAGE_NAME = 'abrar33001/todo-api'
         IMAGE_TAG = "${env.BUILD_NUMBER}"
-        PATH = "C:\\Program Files\\Docker\\Docker\\resources\\bin;${env.PATH}"
+        PATH = "C:\\Users\\abrar ul haq\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin;${env.PATH}"
     }
 
     stages {
