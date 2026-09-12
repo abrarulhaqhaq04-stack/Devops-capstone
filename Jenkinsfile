@@ -27,16 +27,15 @@ pipeline {
             }
         }
 
-        stage('Build Docker Image') {
-            steps {
-                bat '''
-                    docker --version
-                    cd app
-                   docker build -t %IMAGE_NAME%:%IMAGE_TAG% -t %IMAGE_NAME%:latest .
-                   ...
-            }
-        }
-
+      stage('Build Docker Image') {
+    steps {
+        bat '''
+            docker --version
+            cd app
+            docker build -t %IMAGE_NAME%:%IMAGE_TAG% -t %IMAGE_NAME%:latest .
+        '''
+    }
+}
         stage('Push to Docker Hub') {
             steps {
                 bat 'echo %DOCKERHUB_CREDENTIALS_PSW% | docker login -u %DOCKERHUB_CREDENTIALS_USR% --password-stdin'
