@@ -5,6 +5,8 @@ pipeline {
         DOCKERHUB_CREDENTIALS = credentials('DOCKERHUB-CRAD')
         IMAGE_NAME = 'abrar33001/todo-api'
         IMAGE_TAG = "${env.BUILD_NUMBER}"
+    PATH = "C:\\Program Files\\Docker\\Docker\\resources\\bin;${env.PATH}"
+}
     }
 
     stages {
@@ -28,7 +30,11 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                bat 'cd app && docker build -t %IMAGE_NAME%:%IMAGE_TAG% -t %IMAGE_NAME%:latest .'
+                 bat '''
+            docker --version
+            cd app
+            docker build -t abrar33001/todo-api:27 -t abrar33001/todo-api:latest .
+        '''
             }
         }
 
