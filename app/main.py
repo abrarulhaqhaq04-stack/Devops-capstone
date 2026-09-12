@@ -43,16 +43,4 @@ def get_todo(todo_id: str):
 
 
 @app.put("/todos/{todo_id}")
-def update_todo(todo_id: str, todo: Todo):
-    if todo_id not in todos:
-        raise HTTPException(status_code=404, detail="Todo not found")
-    todos[todo_id] = todo.dict()
-    return {"id": todo_id, **todo.dict()}
-
-
-@app.delete("/todos/{todo_id}")
-def delete_todo(todo_id: str):
-    if todo_id not in todos:
-        raise HTTPException(status_code=404, detail="Todo not found")
-    del todos[todo_id]
-    return {"deleted": todo_id}
+def update
