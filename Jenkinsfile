@@ -5,46 +5,37 @@ pipeline {
         DOCKERHUB_CREDENTIALS = credentials('DOCKERHUB-CRAD')
         IMAGE_NAME = 'abrar33001/todo-api'
         IMAGE_TAG = "${env.BUILD_NUMBER}"
-    
-    PATH = "C:\\Program Files\\Docker\\Docker\\resources\\bin;${env.PATH}"
-    // ...
-
+        PATH = "C:\\Users\\abrar ul haq\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin;${env.PATH}"
     }
 
     stages {
-        stage('Checkout') {
-            steps {
-                git branch: 'main', url: 'https://github.com/abrarulhaqhaq04-stack/Devops-capstone.git'
-            }
-        }
-
-        stage('Debug') {
-    steps {
-        bat 'dir /s /b requirements.txt Dockerfile'
-    }
-}
-
         stage('Install Dependencies') {
             steps {
-                bat '"C:/Program Files/Python313/python.exe" -m pip install -r requirements.txt'
+                dir('app') {
+                    bat '"C:/Program Files/Python313/python.exe" -m pip install -r requirements.txt'
+                }
             }
         }
 
         stage('Run Tests') {
             steps {
-                bat '"C:/Program Files/Python313/python.exe" -m pytest'
+                dir('app') {
+                    bat '"C:/Program Files/Python313/python.exe" -m pytest'
+                }
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                bat "docker build -t %IMAGE_NAME%:%IMAGE_TAG% -t %IMAGE_NAME%:latest ."
+                dir('app') {
+                    bat "docker build -t %IMAGE_NAME%:%IMAGE_TAG% -t %IMAGE_NAME%:latest ."
+                }
             }
         }
 
         stage('Push to Docker Hub') {
             steps {
-                bat 'echo %DOCKERHUB_CREDENTIALS_PSW% | docker login -u %DOCKERHUB_CREDENTIALS_USR% --password-stdin'
+                bat 'echo|set /p="%DOCKERHUB_CREDENTIALS_PSW%"| docker login -u %DOCKERHUB_CREDENTIALS_USR% --password-stdin'
                 bat "docker push %IMAGE_NAME%:%IMAGE_TAG%"
                 bat "docker push %IMAGE_NAME%:latest"
             }
@@ -53,7 +44,7 @@ pipeline {
 
     post {
         always {
-           bat(script: 'docker logout', returnStatus: true)
+            bat(script: 'docker logout', returnStatus: true)
         }
         success {
             echo 'Pipeline succeeded! Image pushed to Docker Hub.'
