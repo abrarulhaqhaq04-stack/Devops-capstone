@@ -5,6 +5,10 @@ pipeline {
         DOCKERHUB_CREDENTIALS = credentials('DOCKERHUB-CRAD')
         IMAGE_NAME = 'abrar33001/todo-api'
         IMAGE_TAG = "${env.BUILD_NUMBER}"
+    
+    PATH = "C:\\Program Files\\Docker\\Docker\\resources\\bin;${env.PATH}"
+    // ...
+
     }
 
     stages {
@@ -13,6 +17,12 @@ pipeline {
                 git branch: 'main', url: 'https://github.com/abrarulhaqhaq04-stack/Devops-capstone.git'
             }
         }
+
+        stage('Debug') {
+    steps {
+        bat 'dir /s /b requirements.txt Dockerfile'
+    }
+}
 
         stage('Install Dependencies') {
             steps {
@@ -43,7 +53,7 @@ pipeline {
 
     post {
         always {
-            bat 'docker logout'
+           bat(script: 'docker logout', returnStatus: true)
         }
         success {
             echo 'Pipeline succeeded! Image pushed to Docker Hub.'
