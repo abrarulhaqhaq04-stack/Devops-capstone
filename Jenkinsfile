@@ -2,30 +2,32 @@ pipeline {
     agent any
 
     environment {
-        DOCKERHUB_CREDENTIALS = credentials('DOCKERHUB-CRAD')
-        IMAGE_NAME = 'abrar33001/todo-api'
-        IMAGE_TAG = "${env.BUILD_NUMBER}"
-        PATH = "C:\\Users\\abrar ul haq\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin;${env.PATH}"
+        IMAGE = "abrar33001/todo-api"
     }
 
     stages {
 
         stage('Checkout') {
             steps {
-                git branch: 'main',
-                    url: 'https://github.com/abrarulhaqhaq04-stack/Devops-capstone.git'
+                checkout scm
             }
         }
 
         stage('Install Dependencies') {
             steps {
-                bat 'cd app && "C:/Program Files/Python313/python.exe" -m pip install -r requirements.txt'
+                bat '''
+                    cd app
+                    "C:/Program Files/Python313/python.exe" -m pip install -r requirements.txt
+                '''
             }
         }
 
         stage('Run Tests') {
             steps {
-                bat 'cd app && "C:/Program Files/Python313/python.exe" -m pytest'
+                bat '''
+                    cd app
+                    "C:/Program Files/Python313/python.exe" -m pytest
+                '''
             }
         }
 
@@ -34,34 +36,45 @@ pipeline {
                 bat '''
                     docker --version
                     cd app
-                    docker build -t %IMAGE_NAME%:%IMAGE_TAG% -t %IMAGE_NAME%:latest .
+                    docker build -t %IMAGE%:%BUILD_NUMBER% -t %IMAGE%:latest .
                 '''
+            }
+        }
+
+        stage('Docker Hub Login') {
+            steps {
+                withCredentials([
+                    usernamePassword(
+                        credentialsId: 'DOCKERHUB-CRAD',
+                        usernameVariable: 'DOCKER_USER',
+                        passwordVariable: 'DOCKER_PASS'
+                    )
+                ]) {
+                    bat '''
+                        echo %DOCKER_PASS% | docker login -u %DOCKER_USER% --password-stdin
+                    '''
+                }
             }
         }
 
         stage('Push to Docker Hub') {
             steps {
-                withCredentials([usernamePassword(
-                    credentialsId: 'DOCKERHUB-CRAD',
-                    usernameVariable: 'DOCKER_USER',
-                    passwordVariable: 'DOCKER_PASS'
-                )]) {
-                    bat 'echo %DOCKER_PASS% | docker login -u %DOCKER_USER% --password-stdin'
-                    bat 'docker push %IMAGE_NAME%:%IMAGE_TAG%'
-                    bat 'docker push %IMAGE_NAME%:latest'
-                }
+                bat '''
+                    docker push %IMAGE%:%BUILD_NUMBER%
+                    docker push %IMAGE%:latest
+                '''
             }
         }
     }
 
     post {
-
         always {
             bat 'docker logout'
         }
 
         success {
-            echo 'Pipeline succeeded! Image pushed to Docker Hub.'
+            echo 'Pipeline completed successfully!'
+            echo 'Docker image pushed to Docker Hub.'
         }
 
         failure {
@@ -69,3 +82,4 @@ pipeline {
         }
     }
 }
+
